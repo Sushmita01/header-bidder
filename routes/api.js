@@ -3,6 +3,8 @@ var router = express.Router();
 var path = require('path');
 var fs = require('fs');
 var mysql = require('mysql');
+var Promise=require('promise');
+var publisherID=null;
 
 
 var con = mysql.createConnection({
@@ -15,118 +17,134 @@ var con = mysql.createConnection({
 con.connect(function(err) {
   if (err) throw err;
   console.log("Connected!");
-  getPublisherDetails(con,345);
-  getAdSlots(con,345);
-  getProviders(con,345);
-  getProvidersMap(con,345); 
 });
 
 
 //from db.js
-function getPublisherDetails(conn, publisherID) {
-  conn.query("SELECT * FROM PUBLISHER WHERE ID=" + publisherID + ";", function (err, result) {
-      if (err)
-          throw err;
-      exports.publisherDetails = "[";
-      result.forEach(function (element) {
-          exports.publisherDetails += JSON.stringify(element);
-      });
-      exports.publisherDetails += "]";
-  });
+function query(conn, sql) {
+  return new Promise( ( resolve, reject ) => {
+    conn.query( sql, ( err, rows ) => {
+        if ( err )
+            return reject( err );
+        resolve( rows );
+    } );
+} );
 }
 
+function getData(cb) {
 
-exports.getPublisherDetails = getPublisherDetails;
-function getAdSlots(conn, publisherID) {
-  conn.query("SELECT publisher_id,slot_id,CONCAT(width, ',', height) AS dimension,slot_name FROM adslot AS a JOIN slot_size AS s ON a.size_id=s.id WHERE publisher_id=" + publisherID + ";", function (err, result) {
-      if (err)
-          throw err;
-      exports.adslots = "[";
-      result.forEach(function (element, index) {
-          if (index != 0)
-              exports.adslots += "," + JSON.stringify(element);
-          else
-              exports.adslots += JSON.stringify(element);
-      });
-      exports.adslots += "]";
-  });
-}
+  getPublisherDetails=query(con,"SELECT * FROM PUBLISHER WHERE ID=" + publisherID + ";");
 
-exports.getAdSlots = getAdSlots;
-function getProviders(conn, publisherID) {
-  conn.query("SELECT * FROM provider WHERE id IN (SELECT providerid FROM adslot_provider WHERE ExternalPublisherID=" + publisherID + ")", function (err, result) {
-      if (err)
-          throw err;
-      exports.providers = "[";
-      result.forEach(function (element, index) {
-          if (index != 0)
-              exports.providers += "," + JSON.stringify(element);
-          else
-              exports.providers += JSON.stringify(element);
-      });
-      exports.providers += "]";
-  });
-}
+  exports.getPublisherDetails = getPublisherDetails;
 
 
-exports.getProviders = getProviders;
-function getProvidersMap(conn, publisherID) {
-  conn.query("SELECT * FROM adslot_provider WHERE ExternalPublisherID=" + publisherID, function (err, result) {
-      if (err)
-          throw err;
-      exports.adProvidermap = "[";
-      result.forEach(function (element, index) {
-          if (index != 0)
-              exports.adProvidermap += "," + JSON.stringify(element);
-          else
-              exports.adProvidermap += JSON.stringify(element);
-      });
-      exports.adProvidermap += "]";
-  });
-}
+  getAdSlots=query(con,"SELECT publisher_id,slot_id,CONCAT(width, 'x', height) AS dimension,slot_name FROM adslot AS a JOIN slot_size AS s ON a.size_id=s.id WHERE publisher_id=" + publisherID + ";");
 
-exports.getProvidersMap = getProvidersMap;
+  exports.getAdSlots = getAdSlots;
 
 
-// // Create a readable stream
-// var readerStream = fs.createReadStream('./hb.js');
+  getProviders=query(con,"SELECT * FROM provider WHERE id IN (SELECT providerid FROM adslot_provider WHERE ExternalPublisherID=" + publisherID + ")");
 
-// // Create a writable stream
-// var writerStream = fs.createWriteStream('public/javascripts/final.js');
-// readerStream.pipe(writerStream);
-
-// fs.appendFile('public/javascripts/final.js', exports.publisherDetails, function (err) {
-//   if (err) throw err;
-//   console.log('Saved!');
-  
-// });
+  exports.getProviders = getProviders;
 
 
-fs.readFile('./headerBidder.js', function(err,data) {
-  if (err) {
-     return console.error(err);
-  }
+  getProvidersMap=query(con,"SELECT * FROM adslot_provider WHERE ExternalPublisherID=" + publisherID);
 
-  console.log("Let's write newly read data");
-  
-  fs.writeFile('public/javascripts/final.js', data, function (err) {
-     if (err) {
+  exports.getProvidersMap = getProvidersMap;
+
+  Promise.all([getPublisherDetails, getAdSlots, getProviders,getProvidersMap]).then(function(values) {
+    console.log(values);
+    exports.publisherDetails = "[";
+    values[0].forEach(function (element) {
+        exports.publisherDetails += JSON.stringify(element);
+    });
+    exports.publisherDetails += "]";
+
+    exports.adslots = "[";
+    values[1].forEach(function (element, index) {
+        if (index != 0)
+            exports.adslots += "," + JSON.stringify(element);
+        else
+            exports.adslots += JSON.stringify(element);
+    });
+    exports.adslots += "]";
+
+    exports.providers = "[";
+    values[2].forEach(function (element, index) {
+        if (index != 0)
+            exports.providers += "," + JSON.stringify(element);
+        else
+            exports.providers += JSON.stringify(element);
+    });
+    exports.providers += "]";
+
+    exports.adProvidermap = "[";
+    values[3].forEach(function (element, index) {
+        if (index != 0)
+            exports.adProvidermap += "," + JSON.stringify(element);
+        else
+            exports.adProvidermap += JSON.stringify(element);
+    });
+    exports.adProvidermap += "]";
+
+    
+  fs.readFile('./headerBidder.js', function(err,coreData) {
+    if (err) {
+      return console.error(err);
+    }
+
+    fs.writeFile('public/javascripts/final.js', "var config={publisherDetails:"+exports.publisherDetails+",adslots: "+exports.adslots+",providers: "+exports.providers+",AdslotProvidersMap:"+ exports.adProvidermap+"};", function (err) {
+      if (err) {
         return console.error(err);
-     }
-     fs.appendFile('public/javascripts/final.js', "var config={publisherDetails:"+exports.publisherDetails+",adslots: "+exports.adslots+",providers: "+exports.providers+",AdslotProvidersMap:"+ exports.adProvidermap+"}", function (err) {
-        if (err) throw err;
-        console.log('Saved!');
-        
-      });
-  });
-});
+      }
+      fs.appendFile('public/javascripts/final.js', coreData , function (err) {
+        if (err) {
+          return console.error(err);
+        }
+        fs.readFile('./adapterManager.js', function (err,adapterData) {
+          if (err) throw err; 
+          
+          fs.appendFile('public/javascripts/final.js', adapterData , function (err) {
+            if (err) {
+              return console.error(err);
+            }
+            fs.readFile('./auctionManager.js', function (err,auctionData) {
+              if (err) throw err;   
+              
+              fs.appendFile('public/javascripts/final.js', auctionData , function (err) {
+                if (err) {
+                  return console.error(err);
+                }
+                fs.readFile('./logger.js', function (err,loggerData) {
+                  if (err) throw err;
+                  
+                  fs.appendFile('public/javascripts/final.js', loggerData , function (err) {
+                    if (err) {
+                      return console.error(err);
+                    }
+                    cb();
+                  })
+                });
+            });
+            });
+        });
+        });
+    });
+    })
 
+  });
+
+  });
+
+}
 
 
 
 /* GET final js file to be sent to the client */
 router.get('/', function(req, res, next) {
-  res.sendFile(path.join(__dirname, '../public/javascripts', 'final.js'));
+  publisherID=parseInt(req.query.publisher);
+  getData(()=> { res.sendFile(path.join(__dirname, '../public/javascripts', 'final.js'));});
+
 });
 
 
@@ -142,4 +160,6 @@ router.get('/config', function(req, res, next) {
   console.log("config :"+exports.config);
   res.send(exports.config);
 });
+
+
 module.exports = router;

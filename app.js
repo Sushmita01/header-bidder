@@ -6,6 +6,7 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var apiRouter = require('./routes/api');
+var bidRouter=  require('./routes/bid');
 
 var app = express();
 
@@ -18,6 +19,7 @@ app.use('/scripts', express.static(__dirname + '/public/javascripts'));
 
 app.use('/', indexRouter);
 app.use('/api', apiRouter);
+app.use('/getBid', bidRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

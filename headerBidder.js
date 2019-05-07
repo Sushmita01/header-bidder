@@ -1,4 +1,3 @@
-alert("yes,it works!");
-console.log("logging from header-bidder");
-console.log("config comes below");
-//some application code
+// Hello from headerBidder.js
+// I am the core; I integrate all modules
+//register auction for all slots
