@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "tsc:w": "tsc headerBidder.ts adapterManager.ts auctionManager.ts logger.ts -w",
-    "start": "concurrently \"npm run tsc:w\"  \"node ./bin/www\" "
+    "start": "concurrently \"npm run tsc:w\"  \"node ./bin/www\" ",
+    "begin": "node ./bin/www" 
   },
   "dependencies": {
     "concurrently": "^4.1.0",

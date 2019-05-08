@@ -53,7 +53,7 @@ function getData(cb) {
   exports.getProvidersMap = getProvidersMap;
 
   Promise.all([getPublisherDetails, getAdSlots, getProviders,getProvidersMap]).then(function(values) {
-    console.log(values);
+    // console.log(values);
     exports.publisherDetails = "[";
     values[0].forEach(function (element) {
         exports.publisherDetails += JSON.stringify(element);
@@ -88,19 +88,13 @@ function getData(cb) {
     exports.adProvidermap += "]";
 
     
-  fs.readFile('./headerBidder.js', function(err,coreData) {
-    if (err) {
-      return console.error(err);
-    }
+  
 
     fs.writeFile('public/javascripts/final.js', "var config={publisherDetails:"+exports.publisherDetails+",adslots: "+exports.adslots+",providers: "+exports.providers+",AdslotProvidersMap:"+ exports.adProvidermap+"};", function (err) {
       if (err) {
         return console.error(err);
       }
-      fs.appendFile('public/javascripts/final.js', coreData , function (err) {
-        if (err) {
-          return console.error(err);
-        }
+     
         fs.readFile('./adapterManager.js', function (err,adapterData) {
           if (err) throw err; 
           
@@ -122,7 +116,15 @@ function getData(cb) {
                     if (err) {
                       return console.error(err);
                     }
-                    cb();
+                    fs.readFile('./headerBidder.js', function(err,coreData) {
+                      if (err) {
+                        return console.error(err);
+                      }
+                      fs.appendFile('public/javascripts/final.js', coreData , function (err) {
+                        if (err) {
+                          return console.error(err);
+                        }
+                        cb();
                   })
                 });
             });

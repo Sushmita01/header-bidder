@@ -19,8 +19,7 @@ class Auction {
 
     }
     registerAuction = function() {
-        console.log("registering auctions..");
-        this.auctionID="A"+this.slotID;       
+        this.auctionID="A"+(this.slotID).toString();       
         
     }
 
@@ -39,20 +38,10 @@ class Auction {
         return this.status;
     }
     
-    addBids = function() {
-        //adds bids to adslot
+    addBids = function(bidObjects) {
+        this.bids.push(bidObjects)
         
     }
-    
-}
-
-
-createAdapter();
-//core
-for (let slot of config.adslots) {
-    console.log("creating auction for",slot);
-    let auctionObj=new Auction(slot['slot_id'],slot['dimension']);
-    auctionObj.registerAuction();
     
 }
 

@@ -6,8 +6,7 @@ var Auction = /** @class */ (function () {
     function Auction(slotID, slotSize) {
         this.bids = [];
         this.registerAuction = function () {
-            console.log("registering auctions..");
-            this.auctionID = "A" + this.slotID;
+            this.auctionID = "A" + (this.slotID).toString();
         };
         this.closeAuction = function () {
             console.log("closing auction..");
@@ -21,8 +20,8 @@ var Auction = /** @class */ (function () {
             console.log("auction", this.auctionID, "is", this.status ? 'Closed' : 'Active');
             return this.status;
         };
-        this.addBids = function () {
-            //adds bids to adslot
+        this.addBids = function (bidObjects) {
+            this.bids.push(bidObjects);
         };
         this.slotID = slotID;
         this.slotSize = slotSize;
@@ -30,11 +29,3 @@ var Auction = /** @class */ (function () {
     }
     return Auction;
 }());
-createAdapter();
-//core
-for (var _i = 0, _a = config.adslots; _i < _a.length; _i++) {
-    var slot = _a[_i];
-    console.log("creating auction for", slot);
-    var auctionObj = new Auction(slot['slot_id'], slot['dimension']);
-    auctionObj.registerAuction();
-}
