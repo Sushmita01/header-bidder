@@ -1,53 +1,60 @@
 // Hello from adapterManager.js
 // I make adapter objects from provider-adslot maps
-var adapters = {};
+var bidParams = [];
 var Bid = /** @class */ (function () {
-    function Bid() {
+    function Bid(CPM, code, provider) {
+        this.CPM = CPM;
+        this.code = code;
+        this.provider = provider;
     }
     return Bid;
 }());
 var Adapter = /** @class */ (function () {
-    function Adapter(noBid, code, EPC, size) {
+    function Adapter(auctionID, noBid, EPC, size, provider, floorPrice) {
+        this.auctionID = auctionID;
         this.noBid = noBid;
-        this.code = code;
         this.EPC = EPC;
         this.size = size;
+        this.provider = provider;
+        this.floorPrice = floorPrice;
     }
+    ;
     return Adapter;
 }());
-function getBids(params) {
+function createBid(adapter) {
+    //create a bid object
+    return new Bid(adapter.CPM, adapter.code, adapter.provider);
+}
+function getBid(currentAdapter, len) {
     //get bids
-    this.params = params;
-    console.log("params to fetch bids", params);
     // construct an HTTP request
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'http://localhost:3000/getBid', true);
-    xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-    // send the collected data as JSON
-    xhr.send(JSON.stringify(params));
-    xhr.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            var bidResponse = JSON.parse(this.responseText);
-            console.log("response bid", bidResponse);
-            mapBidsToAdapters(bidResponse);
-        }
-    };
-}
-function addBidsToAuction() {
-    for (var _i = 0, registeredAuctions_1 = registeredAuctions; _i < registeredAuctions_1.length; _i++) {
-        var auction = registeredAuctions_1[_i];
-        console.log(auction);
+    bidParams.push(currentAdapter);
+    if (bidParams.length == len) {
+        //now we can make a call for bids
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'http://localhost:3000/getBid', true);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+        // send the collected data as JSON
+        xhr.send(JSON.stringify(bidParams));
+        xhr.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var bidResponse = JSON.parse(this.responseText);
+                if (bidResponse.length == len) {
+                    console.log("all bids received", bidResponse);
+                    for (var _i = 0, bidResponse_1 = bidResponse; _i < bidResponse_1.length; _i++) {
+                        var adapter = bidResponse_1[_i];
+                        var relevantAuction = adapter.auctionID;
+                        if (adapter.noBid == false) { //if adapter received a valid bid then create a bid object
+                            var newBid = createBid(adapter);
+                            registeredAuctions[relevantAuction].addBids(newBid); //calling addBids of relevant auction
+                        }
+                        // console.log(`adding bids..`,registeredAuctions[relevantAuction]);
+                    }
+                    closeAuctions();
+                }
+            }
+        };
     }
-}
-function mapBidsToAdapters(bidResponse) {
-    for (var _i = 0, bidResponse_1 = bidResponse; _i < bidResponse_1.length; _i++) {
-        var bid = bidResponse_1[_i];
-        var currSlot = bid.slotID;
-        var currProv = bid.providerID;
-        adapters[currSlot][currProv].bidAmount = bid.amount;
-        adapters[currSlot][currProv].noBid = false;
-    }
-    addBidsToAuction();
 }
 //create provider ID-Name map
 var providerIDMap = {};
@@ -65,21 +72,16 @@ for (var _b = 0, _c = config.adslots; _b < _c.length; _b++) {
         adSlotSizeMap[ad['slot_id']] = ad['dimension'];
     }
 }
-function createAdapter() {
-    var bidParams = [];
-    for (var _i = 0, _a = config.AdslotProvidersMap; _i < _a.length; _i++) {
+function createAdapter(auctionObj) {
+    console.log("current", auctionObj); //has slot details
+    for (var _i = 0, _a = config.AdslotProvidersMap; _i < _a.length; _i++) { //looping through providers map for a particular publisher
         var mapObject = _a[_i];
-        bidParams.push({ 'slotID': mapObject['slotID'], 'providerID': providerIDMap[mapObject['providerID']], 'floorPrice': mapObject['FloorPrice'] });
-        var currentProv = providerIDMap[mapObject['providerID']];
-        var adapterObject = new Adapter(true, '<h1>some ad code</h1>', mapObject['slotID'], adSlotSizeMap[mapObject['slotID']]);
-        if (adapters.hasOwnProperty(mapObject.slotID)) {
-            adapters[mapObject.slotID][currentProv] = adapterObject;
-        }
-        else {
-            adapters[mapObject.slotID] = {};
-            adapters[mapObject.slotID][currentProv] = adapterObject;
+        //only create adapter if slot matches the slot put up for auction
+        if (mapObject['slotID'] == auctionObj['slotID']) {
+            var currentProv = providerIDMap[mapObject['providerID']]; //publisher, provider
+            var currentAdapter = new Adapter(auctionObj.auctionID, true, mapObject['slotID'], auctionObj['slotSize'], currentProv, mapObject['FloorPrice']);
+            // console.log("currentAdapter",currentAdapter);
+            getBid(currentAdapter, config.AdslotProvidersMap.length); //getting bids
         }
     }
-    console.log("Adapters", adapters);
-    getBids(bidParams);
 }

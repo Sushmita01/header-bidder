@@ -1,7 +1,6 @@
 /// Hello from auctionManager.js
 // I conduct Auctions
-var registeredAuctions = [];
-var adapters = {};
+var registeredAuctions = {};
 var Auction = /** @class */ (function () {
     function Auction(slotID, slotSize) {
         this.bids = [];
@@ -10,18 +9,29 @@ var Auction = /** @class */ (function () {
         };
         this.closeAuction = function () {
             console.log("closing auction..");
+            this.status = true;
         };
         this.getWinner = function () {
             console.log("calculating winner");
             //bidding logic
             //set winner
+            var maxBidCPM = 0;
+            var maxBidObject;
+            for (var _i = 0, _a = this.bids; _i < _a.length; _i++) {
+                var bid = _a[_i];
+                if (bid.CPM > maxBidCPM) {
+                    maxBidObject = bid;
+                    maxBidCPM = bid.CPM;
+                }
+            }
+            this.winner = maxBidObject;
         };
         this.getStatus = function () {
             console.log("auction", this.auctionID, "is", this.status ? 'Closed' : 'Active');
             return this.status;
         };
-        this.addBids = function (bidObjects) {
-            this.bids.push(bidObjects);
+        this.addBids = function (bidObject) {
+            this.bids.push(bidObject);
         };
         this.slotID = slotID;
         this.slotSize = slotSize;
@@ -29,3 +39,11 @@ var Auction = /** @class */ (function () {
     }
     return Auction;
 }());
+function closeAuctions() {
+    for (var auction in registeredAuctions) {
+        registeredAuctions[auction].closeAuction();
+        registeredAuctions[auction].getWinner();
+        show(registeredAuctions[auction]);
+        console.log(registeredAuctions[auction]);
+    }
+}

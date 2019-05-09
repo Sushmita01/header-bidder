@@ -1,8 +1,8 @@
 /// Hello from auctionManager.js
 // I conduct Auctions
 
-var registeredAuctions=[];
-var adapters={};
+var registeredAuctions={};
+
 
 class Auction {
     auctionID: string;
@@ -24,13 +24,23 @@ class Auction {
     }
 
     closeAuction = function() {
-        console.log("closing auction..")
+        console.log("closing auction..");
+        this.status=true;
     }
 
     getWinner = function(){
         console.log("calculating winner")
         //bidding logic
         //set winner
+        let maxBidCPM=0;
+        let maxBidObject;
+        for (let bid of this.bids) {
+            if (bid.CPM>maxBidCPM) {
+                maxBidObject=bid;
+                maxBidCPM=bid.CPM;
+            }
+        }
+        this.winner=maxBidObject;
     }
 
     getStatus = function(){
@@ -38,11 +48,22 @@ class Auction {
         return this.status;
     }
     
-    addBids = function(bidObjects) {
-        this.bids.push(bidObjects)
+    addBids = function(bidObject) {
+        this.bids.push(bidObject)
         
     }
     
+}
+
+
+
+function closeAuctions() {
+    for (let auction in registeredAuctions) {
+        registeredAuctions[auction].closeAuction();
+        registeredAuctions[auction].getWinner();
+        show(registeredAuctions[auction]);
+        console.log(registeredAuctions[auction]);
+    }
 }
 
 
