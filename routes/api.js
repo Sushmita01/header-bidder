@@ -85,9 +85,7 @@ function getData(cb) {
         else
             exports.adProvidermap += JSON.stringify(element);
     });
-    exports.adProvidermap += "]";
-
-    
+    exports.adProvidermap += "]";   
   
 
     fs.writeFile('public/javascripts/final.js', "var config={publisherDetails:"+exports.publisherDetails+",adslots: "+exports.adslots+",providers: "+exports.providers+",AdslotProvidersMap:"+ exports.adProvidermap+"};", function (err) {

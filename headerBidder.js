@@ -10,7 +10,6 @@ function show(auction) {
     iframe.setAttribute("srcdoc", winningAD);
     iframe.setAttribute("height", height);
     currentDiv.appendChild(iframe);
-    console.log(currentDiv);
 }
 //register auction for all slots
 for (var _i = 0, _a = config.adslots; _i < _a.length; _i++) {
