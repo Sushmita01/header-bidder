@@ -181,15 +181,17 @@ for (var _i = 0, _a = config.adslots; _i < _a.length; _i++) {
     }
 }
 function hbShow(divID) {
-    var iframe = document.getElementById(divID);
-    var currentDiv = iframe.parentNode;
+    var currentDiv = document.getElementById(divID);
+    var iframe = document.createElement('iframe');
+    currentDiv.appendChild(iframe);
     var auctionID = "A" + slotDivMap[divID];
     var auction = registeredAuctions[auctionID];
     var winningAD = auction.winner.code.toString();
     var height = auction.slotSize.split('x')[1];
-    iframe.outerHTML = "<iframe height=" + height + " id=" + divID + "></iframe>";
-    var modified = document.getElementById(divID);
-    modified.setAttribute('srcdoc', winningAD);
+    iframe.outerHTML = "<iframe height=" + height + "></iframe>";
+    var customIframe = currentDiv.children[1];
+    customIframe.setAttribute('srcdoc', winningAD);
+    console.log(currentDiv);
 }
 //register auction for all slots
 for (var _b = 0, _c = config.adslots; _b < _c.length; _b++) {

@@ -10,15 +10,17 @@ for (let slot of config.adslots) {
 }
 
 function hbShow(divID) {
-        let iframe=document.getElementById(divID);
-        let currentDiv=iframe.parentNode;
+        let currentDiv=document.getElementById(divID);
+        let iframe=document.createElement('iframe');
+        currentDiv.appendChild(iframe)
         let auctionID="A"+slotDivMap[divID];
         let auction=registeredAuctions[auctionID];
         let winningAD=auction.winner.code.toString();
         let height=auction.slotSize.split('x')[1];
-        iframe.outerHTML="<iframe height="+height+" id="+divID+"></iframe>";
-        let modified=document.getElementById(divID);
-        modified.setAttribute('srcdoc',winningAD);
+        iframe.outerHTML="<iframe height="+height+"></iframe>";
+        let customIframe=currentDiv.children[1];
+        customIframe.setAttribute('srcdoc',winningAD);
+        console.log(currentDiv);
     }
     
 
