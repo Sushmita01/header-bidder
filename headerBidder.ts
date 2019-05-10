@@ -1,5 +1,15 @@
 // Hello from headerBidder.js
 // I am the core; I integrate all modules
+var slotDivMap={};
+for (let slot of config.adslots) {
+    let slotID=slot.slot_id;
+    if (!slotDivMap.hasOwnProperty(slotID)) {
+        slotDivMap[slotID]=slot.divID;
+    }
+
+}
+
+console.log(slotDivMap)
 
 function show(auction) {
     let divID=auction.slotID.toString();

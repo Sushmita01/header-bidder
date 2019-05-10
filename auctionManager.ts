@@ -29,7 +29,6 @@ class Auction {
     }
 
     getWinner = function(){
-        console.log("calculating winner")
         //bidding logic
         //set winner
         let maxBidCPM=0;

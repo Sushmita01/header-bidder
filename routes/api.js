@@ -38,7 +38,7 @@ function getData(cb) {
   exports.getPublisherDetails = getPublisherDetails;
 
 
-  getAdSlots=query(con,"SELECT publisher_id,slot_id,CONCAT(width, 'x', height) AS dimension,slot_name FROM adslot AS a JOIN slot_size AS s ON a.size_id=s.id WHERE publisher_id=" + publisherID + ";");
+  getAdSlots=query(con,"SELECT publisher_id,slot_id,divID,CONCAT(width, 'x', height) AS dimension,slot_name FROM adslot AS a JOIN slot_size AS s ON a.size_id=s.id WHERE publisher_id=" + publisherID + ";");
 
   exports.getAdSlots = getAdSlots;
 

@@ -1,4 +1,4 @@
-var config={publisherDetails:[{"ID":345,"Name":"Recipe.com","isActive":1}],adslots: [{"publisher_id":345,"slot_id":617934,"dimension":"300x200","slot_name":"bottom"},{"publisher_id":345,"slot_id":638257,"dimension":"400x200","slot_name":"middle"}],providers: [{"ID":"OX3845","Name":"OpenX","EntryPoint":"getBid"},{"ID":"AP8875","Name":"AppNexus","EntryPoint":"getBid"},{"ID":"MD5697","Name":"Media.net","EntryPoint":"getBid"},{"ID":"PI7654","Name":"Platform.io","EntryPoint":"getBid"}],AdslotProvidersMap:[{"slotID":617934,"ExternalPublisherID":345,"ExternalPlacementID":null,"RevenueShare":0.2,"FloorPrice":2,"providerID":"OX3845"},{"slotID":617934,"ExternalPublisherID":345,"ExternalPlacementID":null,"RevenueShare":0.3,"FloorPrice":2,"providerID":"AP8875"},{"slotID":617934,"ExternalPublisherID":345,"ExternalPlacementID":null,"RevenueShare":0.2,"FloorPrice":2,"providerID":"MD5697"},{"slotID":617934,"ExternalPublisherID":345,"ExternalPlacementID":null,"RevenueShare":0.1,"FloorPrice":2,"providerID":"PI7654"},{"slotID":638257,"ExternalPublisherID":345,"ExternalPlacementID":null,"RevenueShare":0.1,"FloorPrice":3,"providerID":"PI7654"},{"slotID":638257,"ExternalPublisherID":345,"ExternalPlacementID":null,"RevenueShare":0.2,"FloorPrice":3,"providerID":"MD5697"}]};// Hello from adapterManager.js
+var config={publisherDetails:[{"ID":345,"Name":"Recipe.com","isActive":1}],adslots: [{"publisher_id":345,"slot_id":617934,"divID":"adslot2","dimension":"300x200","slot_name":"bottom"},{"publisher_id":345,"slot_id":638257,"divID":"adslot1","dimension":"400x200","slot_name":"middle"}],providers: [{"ID":"OX3845","Name":"OpenX","EntryPoint":"getBid"},{"ID":"AP8875","Name":"AppNexus","EntryPoint":"getBid"},{"ID":"MD5697","Name":"Media.net","EntryPoint":"getBid"},{"ID":"PI7654","Name":"Platform.io","EntryPoint":"getBid"}],AdslotProvidersMap:[{"slotID":617934,"ExternalPublisherID":345,"ExternalPlacementID":null,"RevenueShare":0.2,"FloorPrice":2,"providerID":"OX3845"},{"slotID":617934,"ExternalPublisherID":345,"ExternalPlacementID":null,"RevenueShare":0.3,"FloorPrice":2,"providerID":"AP8875"},{"slotID":617934,"ExternalPublisherID":345,"ExternalPlacementID":null,"RevenueShare":0.2,"FloorPrice":2,"providerID":"MD5697"},{"slotID":617934,"ExternalPublisherID":345,"ExternalPlacementID":null,"RevenueShare":0.1,"FloorPrice":2,"providerID":"PI7654"},{"slotID":638257,"ExternalPublisherID":345,"ExternalPlacementID":null,"RevenueShare":0.1,"FloorPrice":3,"providerID":"PI7654"},{"slotID":638257,"ExternalPublisherID":345,"ExternalPlacementID":null,"RevenueShare":0.2,"FloorPrice":3,"providerID":"MD5697"}]};// Hello from adapterManager.js
 // I make adapter objects from provider-adslot maps
 var bidParams = [];
 var adapters = [];
@@ -38,8 +38,12 @@ function makeBidRequest(bidParam) {
             var xhr = new XMLHttpRequest();
             xhr.open('POST', 'http://localhost:3000/getBid', true);
             xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+            xhr.timeout = 300;
             // send the collected data as JSON
             xhr.send(JSON.stringify(bidParams));
+            xhr.ontimeout = function (e) {
+                console.log('No bids received.Could not complete in 300ms');
+            };
             xhr.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
                     var bidResponse = JSON.parse(this.responseText);
@@ -61,15 +65,13 @@ function createAdapter(auctionObj) {
         if (mapObject['slotID'] == auctionObj['slotID']) {
             var currentAdapter = new Adapter(auctionObj.auctionID, true, mapObject['slotID'], auctionObj['slotSize'], mapObject['providerID'], mapObject['FloorPrice']);
             adapters.push(currentAdapter);
-            console.log("currentAdapter", currentAdapter);
             var bidPromise = currentAdapter.getBid(); //getting bids
             bidPromise.then(function (data) {
                 for (var _i = 0, adapters_1 = adapters; _i < adapters_1.length; _i++) {
                     var ad = adapters_1[_i];
                     for (var _a = 0, data_1 = data; _a < data_1.length; _a++) {
                         var bid = data_1[_a];
-                        if (ad.provider == bid.providerID && ad.slotID == bid.slotID) {
-                            console.log(ad, bid);
+                        if (ad.providerID == bid.providerID && ad.slotID == bid.slotID) {
                             var relevantAuction = ad.auctionID;
                             ad.noBid == false; //if adapter received a valid bid then create a bid object
                             var newBid = createBid(bid);
@@ -97,7 +99,6 @@ var Auction = /** @class */ (function () {
             this.status = true;
         };
         this.getWinner = function () {
-            console.log("calculating winner");
             //bidding logic
             //set winner
             var maxBidCPM = 0;
@@ -171,6 +172,15 @@ function postLog() {
 }
 // Hello from headerBidder.js
 // I am the core; I integrate all modules
+var slotDivMap = {};
+for (var _i = 0, _a = config.adslots; _i < _a.length; _i++) {
+    var slot = _a[_i];
+    var slotID = slot.slot_id;
+    if (!slotDivMap.hasOwnProperty(slotID)) {
+        slotDivMap[slotID] = slot.divID;
+    }
+    console.log(slotDivMap);
+}
 function show(auction) {
     var divID = auction.slotID.toString();
     var currentDiv = document.getElementById(divID);
@@ -183,8 +193,8 @@ function show(auction) {
     currentDiv.appendChild(iframe);
 }
 //register auction for all slots
-for (var _i = 0, _a = config.adslots; _i < _a.length; _i++) {
-    var slot = _a[_i];
+for (var _b = 0, _c = config.adslots; _b < _c.length; _b++) {
+    var slot = _c[_b];
     // console.log("creating auction for",slot);
     var auctionObj = new Auction(slot['slot_id'], slot['dimension']);
     auctionObj.registerAuction();

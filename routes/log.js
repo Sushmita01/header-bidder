@@ -4,7 +4,9 @@ var fs = require('fs');
 
 router.post('/', function(req, res, next) {
     let message=JSON.stringify(req.body);
-    fs.writeFile('public/system_log.txt',message, function (err) {
+    let timestamp=new Date();
+    console.log(timestamp)
+    fs.writeFile('public/system_log.txt',timestamp+": \n"+message, function (err) {
         if (err) {
           return console.error(err);
         }

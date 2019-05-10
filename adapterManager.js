@@ -38,8 +38,12 @@ function makeBidRequest(bidParam) {
             var xhr = new XMLHttpRequest();
             xhr.open('POST', 'http://localhost:3000/getBid', true);
             xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+            xhr.timeout = 300;
             // send the collected data as JSON
             xhr.send(JSON.stringify(bidParams));
+            xhr.ontimeout = function (e) {
+                console.log('No bids received.Could not complete in 300ms');
+            };
             xhr.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
                     var bidResponse = JSON.parse(this.responseText);
@@ -61,15 +65,13 @@ function createAdapter(auctionObj) {
         if (mapObject['slotID'] == auctionObj['slotID']) {
             var currentAdapter = new Adapter(auctionObj.auctionID, true, mapObject['slotID'], auctionObj['slotSize'], mapObject['providerID'], mapObject['FloorPrice']);
             adapters.push(currentAdapter);
-            console.log("currentAdapter", currentAdapter);
             var bidPromise = currentAdapter.getBid(); //getting bids
             bidPromise.then(function (data) {
                 for (var _i = 0, adapters_1 = adapters; _i < adapters_1.length; _i++) {
                     var ad = adapters_1[_i];
                     for (var _a = 0, data_1 = data; _a < data_1.length; _a++) {
                         var bid = data_1[_a];
-                        if (ad.provider == bid.providerID && ad.slotID == bid.slotID) {
-                            console.log(ad, bid);
+                        if (ad.providerID == bid.providerID && ad.slotID == bid.slotID) {
                             var relevantAuction = ad.auctionID;
                             ad.noBid == false; //if adapter received a valid bid then create a bid object
                             var newBid = createBid(bid);

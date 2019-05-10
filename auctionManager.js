@@ -12,7 +12,6 @@ var Auction = /** @class */ (function () {
             this.status = true;
         };
         this.getWinner = function () {
-            console.log("calculating winner");
             //bidding logic
             //set winner
             var maxBidCPM = 0;
