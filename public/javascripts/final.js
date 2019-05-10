@@ -129,7 +129,7 @@ function closeAuctions() {
     for (var auction in registeredAuctions) {
         registeredAuctions[auction].closeAuction();
         registeredAuctions[auction].getWinner();
-        show(registeredAuctions[auction]);
+        // show(registeredAuctions[auction]);
         console.log(registeredAuctions[auction]);
     }
     logAuctionWinner(registeredAuctions);
@@ -175,22 +175,30 @@ function postLog() {
 var slotDivMap = {};
 for (var _i = 0, _a = config.adslots; _i < _a.length; _i++) {
     var slot = _a[_i];
-    var slotID = slot.slot_id;
-    if (!slotDivMap.hasOwnProperty(slotID)) {
-        slotDivMap[slotID] = slot.divID;
+    var divID = slot.divID;
+    if (!slotDivMap.hasOwnProperty(divID)) {
+        slotDivMap[divID] = slot.slot_id;
     }
-    console.log(slotDivMap);
 }
-function show(auction) {
-    var divID = auction.slotID.toString();
-    var currentDiv = document.getElementById(divID);
-    var winningAD = auction.winner.code;
-    var height = auction.slotSize.split('x')[0];
-    currentDiv.style.height = height;
-    var iframe = document.createElement("iframe");
-    iframe.setAttribute("srcdoc", winningAD);
-    iframe.setAttribute("height", height);
-    currentDiv.appendChild(iframe);
+console.log(slotDivMap);
+function hbShow(divID) {
+    var iframe = document.getElementById(divID);
+    var currentDiv = iframe.parentNode;
+    console.log(currentDiv);
+    var auctionID = "A" + slotDivMap[divID];
+    var auction = registeredAuctions[auctionID];
+    var winningAD = auction.winner.code.toString();
+    var height = auction.slotSize.split('x')[1];
+    // currentDiv.style.height=height;
+    // iframe['height']=height;
+    iframe.outerHTML = "<iframe height=" + height + " id=" + divID + "></iframe>";
+    var modified = document.getElementById(divID);
+    modified.setAttribute('srcdoc', winningAD);
+    console.log(modified);
+    // new_element.removeEventListener("load", ()=> {
+    //     console.log('render complete')
+    //     console.log(iframe);
+    // },true)
 }
 //register auction for all slots
 for (var _b = 0, _c = config.adslots; _b < _c.length; _b++) {

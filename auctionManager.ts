@@ -60,7 +60,7 @@ function closeAuctions() {
     for (let auction in registeredAuctions) {
         registeredAuctions[auction].closeAuction();
         registeredAuctions[auction].getWinner();
-        show(registeredAuctions[auction]);
+        // show(registeredAuctions[auction]);
         console.log(registeredAuctions[auction]);
 
     }

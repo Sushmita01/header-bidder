@@ -40,7 +40,7 @@ main {
   background-color: rgb(250, 250, 250);
   box-sizing: border-box;
 }
-#image, #recipe, #ingredients-container,#author,[id='617934'] {
+#image, #recipe, #ingredients-container,#author,#adslot2 {
   width: 100%;
   box-sizing: border-box;
 
@@ -70,7 +70,7 @@ img {
 #ingredients {
 
 }
-[id='638257']{
+#adslot1,#adslot2{
   display: inline;
 }
 #recipe {
@@ -78,10 +78,8 @@ img {
 
 }
 
-[id='617934'] {
-  display: inline;
-}
-
 iframe {
   border: none;
+  width: 100%;
+  height: 100%;
 }

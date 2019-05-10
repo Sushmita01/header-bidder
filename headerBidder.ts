@@ -2,26 +2,30 @@
 // I am the core; I integrate all modules
 var slotDivMap={};
 for (let slot of config.adslots) {
-    let slotID=slot.slot_id;
-    if (!slotDivMap.hasOwnProperty(slotID)) {
-        slotDivMap[slotID]=slot.divID;
+    let divID=slot.divID;
+    if (!slotDivMap.hasOwnProperty(divID)) {
+        slotDivMap[divID]=slot.slot_id;
     }
 
 }
 
 console.log(slotDivMap)
 
-function show(auction) {
-    let divID=auction.slotID.toString();
-    let currentDiv=document.getElementById(divID);
-    let winningAD=auction.winner.code;
-    let height=auction.slotSize.split('x')[0];
-    currentDiv.style.height=height;
-    var iframe = document.createElement("iframe");
-    iframe.setAttribute("srcdoc",winningAD)
-    iframe.setAttribute("height",height)
-    currentDiv.appendChild(iframe) 
-}
+
+function hbShow(divID) {
+        let iframe=document.getElementById(divID);
+        let currentDiv=iframe.parentNode;
+        console.log(currentDiv);
+        let auctionID="A"+slotDivMap[divID];
+        let auction=registeredAuctions[auctionID];
+        let winningAD=auction.winner.code.toString();
+        let height=auction.slotSize.split('x')[1];
+        iframe.outerHTML="<iframe height="+height+" id="+divID+"></iframe>";
+        let modified=document.getElementById(divID);
+        modified.setAttribute('srcdoc',winningAD);
+        console.log(modified);
+    }
+    
 
 //register auction for all slots
 for (let slot of config.adslots) {
