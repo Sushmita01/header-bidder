@@ -29,6 +29,7 @@ class Adapter {
     slotID: number;
     providerID: string;
     floorPrice: number;
+    revenueShare: number;
     size : string;
     getBid = function () {
         let bidParam={slotID: this.slotID, providerID: this.providerID, floorPrice: this.floorPrice,size:this.size};

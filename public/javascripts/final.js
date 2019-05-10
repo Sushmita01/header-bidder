@@ -180,25 +180,16 @@ for (var _i = 0, _a = config.adslots; _i < _a.length; _i++) {
         slotDivMap[divID] = slot.slot_id;
     }
 }
-console.log(slotDivMap);
 function hbShow(divID) {
     var iframe = document.getElementById(divID);
     var currentDiv = iframe.parentNode;
-    console.log(currentDiv);
     var auctionID = "A" + slotDivMap[divID];
     var auction = registeredAuctions[auctionID];
     var winningAD = auction.winner.code.toString();
     var height = auction.slotSize.split('x')[1];
-    // currentDiv.style.height=height;
-    // iframe['height']=height;
     iframe.outerHTML = "<iframe height=" + height + " id=" + divID + "></iframe>";
     var modified = document.getElementById(divID);
     modified.setAttribute('srcdoc', winningAD);
-    console.log(modified);
-    // new_element.removeEventListener("load", ()=> {
-    //     console.log('render complete')
-    //     console.log(iframe);
-    // },true)
 }
 //register auction for all slots
 for (var _b = 0, _c = config.adslots; _b < _c.length; _b++) {

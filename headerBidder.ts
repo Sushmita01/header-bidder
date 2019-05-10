@@ -9,13 +9,9 @@ for (let slot of config.adslots) {
 
 }
 
-console.log(slotDivMap)
-
-
 function hbShow(divID) {
         let iframe=document.getElementById(divID);
         let currentDiv=iframe.parentNode;
-        console.log(currentDiv);
         let auctionID="A"+slotDivMap[divID];
         let auction=registeredAuctions[auctionID];
         let winningAD=auction.winner.code.toString();
@@ -23,7 +19,6 @@ function hbShow(divID) {
         iframe.outerHTML="<iframe height="+height+" id="+divID+"></iframe>";
         let modified=document.getElementById(divID);
         modified.setAttribute('srcdoc',winningAD);
-        console.log(modified);
     }
     
 
