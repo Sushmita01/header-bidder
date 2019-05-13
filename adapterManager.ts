@@ -79,7 +79,7 @@ function makeBidRequest(bidParam)  {
             let bidResponse=JSON.parse(this.responseText);
             if (bidResponse.length==config.AdslotProvidersMap.length) {
                 console.log("all bids received",bidResponse);
-                logProviderResponse(bidResponse);    //pushing to log channel
+                // logProviderResponse(bidResponse);    //pushing to log channel
                 resolve(bidResponse);
 
             }

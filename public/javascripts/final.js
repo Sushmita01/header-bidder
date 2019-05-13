@@ -49,7 +49,7 @@ function makeBidRequest(bidParam) {
                     var bidResponse = JSON.parse(this.responseText);
                     if (bidResponse.length == config.AdslotProvidersMap.length) {
                         console.log("all bids received", bidResponse);
-                        logProviderResponse(bidResponse); //pushing to log channel
+                        // logProviderResponse(bidResponse);    //pushing to log channel
                         resolve(bidResponse);
                     }
                 }
@@ -132,8 +132,8 @@ function closeAuctions() {
         // show(registeredAuctions[auction]);
         console.log(registeredAuctions[auction]);
     }
-    logAuctionWinner(registeredAuctions);
-    postLog();
+    // logAuctionWinner(registeredAuctions)
+    // postLog();
 }
 // Hello from logger.js
 // I take care of sending things to log to the server

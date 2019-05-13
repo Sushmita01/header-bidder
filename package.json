@@ -20,6 +20,20 @@
     "typescript": "^2.1.6"
   },
   "devDependencies": {
-    "webpack": "^4.31.0"
-  }
+    "webpack": "^4.31.0",
+    "webpack-cli": "^3.3.2"
+  },
+  "main": "adapterManager.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sushmita01/header-bidder.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sushmita01/header-bidder/issues"
+  },
+  "homepage": "https://github.com/Sushmita01/header-bidder#readme",
+  "description": ""
 }

@@ -64,8 +64,8 @@ function closeAuctions() {
         console.log(registeredAuctions[auction]);
 
     }
-    logAuctionWinner(registeredAuctions)
-    postLog();
+    // logAuctionWinner(registeredAuctions)
+    // postLog();
 }
 
 
