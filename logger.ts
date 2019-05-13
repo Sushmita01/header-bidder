@@ -7,10 +7,10 @@ var message = {
     auctionWinner:null
 };
 
-function logProviderResponse(response) {
+export function logProviderResponse(response) {
     message.providerResponses=response;
 }
-function logAuctionParticipant(response) {
+export function logAuctionParticipant(response) {
     let participants={};
     for (let auction in response) {
         participants[auction]=response[auction].bids;
@@ -18,7 +18,7 @@ function logAuctionParticipant(response) {
     message.auctionParticipants=participants;
 }
 
-function logAuctionWinner(response) {
+export function logAuctionWinner(response) {
     let winners={};
     for (let auction in response) {
         winners[auction]={"provider":response[auction].winner.provider,"CPM":response[auction].winner.CPM};
@@ -27,7 +27,7 @@ function logAuctionWinner(response) {
 }
 
 
-function postLog() {
+export function postLog() {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', 'http://localhost:3000/log', true);
     xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');

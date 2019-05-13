@@ -1,5 +1,12 @@
 // Hello from headerBidder.js
 // I am the core; I integrate all modules
+import * as auctionManager from './auctionManager';
+import * as adapterManager from './adapterManager';
+import * as logger from './logger';
+
+
+
+
 var slotDivMap={};
 for (let slot of config.adslots) {
     let divID=slot.divID;
@@ -9,27 +16,32 @@ for (let slot of config.adslots) {
 
 }
 
-function hbShow(divID) {
+window.hbShow=function hbShow(divID) {
         let currentDiv=document.getElementById(divID);
         let iframe=document.createElement('iframe');
         currentDiv.appendChild(iframe)
         let auctionID="A"+slotDivMap[divID];
-        let auction=registeredAuctions[auctionID];
+        let auction=auctionManager.registeredAuctions[auctionID];
         let winningAD=auction.winner.code.toString();
         let height=auction.slotSize.split('x')[1];
         iframe.setAttribute('height',height)
         iframe.setAttribute('srcdoc',winningAD);
-        console.log(currentDiv);
+        console.log(currentDiv,"got rendered!");
     }
     
 
 //register auction for all slots
 for (let slot of config.adslots) {
     // console.log("creating auction for",slot);
-    let auctionObj=new Auction(slot['slot_id'],slot['dimension']);
+    let auctionObj=new auctionManager.Auction(slot['slot_id'],slot['dimension']);
     auctionObj.registerAuction();
-    registeredAuctions[auctionObj.auctionID]=auctionObj;
-    createAdapter(auctionObj);
+    auctionManager.registeredAuctions[auctionObj.auctionID]=auctionObj;
+    let bidsAdded=adapterManager.createAdapter(auctionObj);
+    bidsAdded.then(()=> {
+        auctionManager.closeAuctions();
+        logger.logAuctionWinner(auctionManager.registeredAuctions)
+        logger.postLog();
+    })
 }
 
 

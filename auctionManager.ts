@@ -1,10 +1,9 @@
 /// Hello from auctionManager.js
 // I conduct Auctions
 
-var registeredAuctions={};
+export var registeredAuctions={};
 
-
-class Auction {
+export class Auction {
     auctionID: string;
     slotID: Number;
     slotSize: string;
@@ -55,17 +54,19 @@ class Auction {
 }
 
 
-
-function closeAuctions() {
+export function closeAuctions() {
     for (let auction in registeredAuctions) {
         registeredAuctions[auction].closeAuction();
         registeredAuctions[auction].getWinner();
-        // show(registeredAuctions[auction]);
         console.log(registeredAuctions[auction]);
 
     }
-    // logAuctionWinner(registeredAuctions)
-    // postLog();
+    
 }
+
+
+
+
+
 
 

@@ -1,5 +1,9 @@
+"use strict";
 // Hello from adapterManager.js
 // I make adapter objects from provider-adslot maps
+exports.__esModule = true;
+var auctionManager = require("./auctionManager");
+var logger = require("./logger");
 var bidParams = [];
 var adapters = [];
 var Bid = /** @class */ (function () {
@@ -59,29 +63,34 @@ function makeBidRequest(bidParam) {
 }
 function createAdapter(auctionObj) {
     console.log("current", auctionObj); //has slot details
-    for (var _i = 0, _a = config.AdslotProvidersMap; _i < _a.length; _i++) { //looping through providers map for a particular publisher
-        var mapObject = _a[_i];
-        //only create adapter if slot matches the slot put up for auction
-        if (mapObject['slotID'] == auctionObj['slotID']) {
-            var currentAdapter = new Adapter(auctionObj.auctionID, true, mapObject['slotID'], auctionObj['slotSize'], mapObject['providerID'], mapObject['FloorPrice']);
-            adapters.push(currentAdapter);
-            var bidPromise = currentAdapter.getBid(); //getting bids
-            bidPromise.then(function (data) {
-                for (var _i = 0, adapters_1 = adapters; _i < adapters_1.length; _i++) {
-                    var ad = adapters_1[_i];
-                    for (var _a = 0, data_1 = data; _a < data_1.length; _a++) {
-                        var bid = data_1[_a];
-                        if (ad.providerID == bid.providerID && ad.slotID == bid.slotID) {
-                            var relevantAuction = ad.auctionID;
-                            ad.noBid == false; //if adapter received a valid bid then create a bid object
-                            var newBid = createBid(bid);
-                            registeredAuctions[relevantAuction].addBids(newBid); //calling addBids of relevant auction
+    return new Promise(function (resolve, reject) {
+        // Do async job
+        for (var _i = 0, _a = config.AdslotProvidersMap; _i < _a.length; _i++) { //looping through providers map for a particular publisher
+            var mapObject = _a[_i];
+            //only create adapter if slot matches the slot put up for auction
+            if (mapObject['slotID'] == auctionObj['slotID']) {
+                var currentAdapter = new Adapter(auctionObj.auctionID, true, mapObject['slotID'], auctionObj['slotSize'], mapObject['providerID'], mapObject['FloorPrice']);
+                adapters.push(currentAdapter);
+                var bidPromise = currentAdapter.getBid(); //getting bids
+                bidPromise.then(function (data) {
+                    for (var _i = 0, adapters_1 = adapters; _i < adapters_1.length; _i++) {
+                        var ad = adapters_1[_i];
+                        for (var _a = 0, data_1 = data; _a < data_1.length; _a++) {
+                            var bid = data_1[_a];
+                            if (ad.providerID == bid.providerID && ad.slotID == bid.slotID) {
+                                var relevantAuction = ad.auctionID;
+                                // ad.noBid==false                  //if adapter received a valid bid then create a bid object
+                                var newBid = createBid(bid);
+                                auctionManager.registeredAuctions[relevantAuction].addBids(newBid); //calling addBids of relevant auction
+                            }
                         }
                     }
-                }
-                logAuctionParticipant(registeredAuctions);
-                closeAuctions();
-            });
+                    logger.logAuctionParticipant(auctionManager.registeredAuctions);
+                    resolve(true);
+                    // 
+                });
+            }
         }
-    }
+    });
 }
+exports.createAdapter = createAdapter;

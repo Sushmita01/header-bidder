@@ -92,46 +92,17 @@ function getData(cb) {
       if (err) {
         return console.error(err);
       }
-     
-        fs.readFile('./adapterManager.js', function (err,adapterData) {
-          if (err) throw err; 
-          
-          fs.appendFile('public/javascripts/final.js', adapterData , function (err) {
-            if (err) {
-              return console.error(err);
-            }
-            fs.readFile('./auctionManager.js', function (err,auctionData) {
-              if (err) throw err;   
-              
-              fs.appendFile('public/javascripts/final.js', auctionData , function (err) {
-                if (err) {
-                  return console.error(err);
-                }
-                fs.readFile('./logger.js', function (err,loggerData) {
-                  if (err) throw err;
-                  
-                  fs.appendFile('public/javascripts/final.js', loggerData , function (err) {
-                    if (err) {
-                      return console.error(err);
-                    }
-                    fs.readFile('./headerBidder.js', function(err,coreData) {
-                      if (err) {
-                        return console.error(err);
-                      }
-                      fs.appendFile('public/javascripts/final.js', coreData , function (err) {
-                        if (err) {
-                          return console.error(err);
-                        }
-                        cb();
-                  })
-                });
-            });
-            });
-        });
-        });
+      fs.readFile('public/javascripts/minifiedCore.js', function(err,coreData) {
+        if (err) {
+          return console.error(err);
+        }
+        fs.appendFile('public/javascripts/final.js', coreData , function (err) {
+          if (err) {
+            return console.error(err);
+          }
+          cb();
+      })
     });
-    })
-
   });
 
   });

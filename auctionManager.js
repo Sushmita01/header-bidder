@@ -1,6 +1,8 @@
+"use strict";
 /// Hello from auctionManager.js
 // I conduct Auctions
-var registeredAuctions = {};
+exports.__esModule = true;
+exports.registeredAuctions = {};
 var Auction = /** @class */ (function () {
     function Auction(slotID, slotSize) {
         this.bids = [];
@@ -38,13 +40,12 @@ var Auction = /** @class */ (function () {
     }
     return Auction;
 }());
+exports.Auction = Auction;
 function closeAuctions() {
-    for (var auction in registeredAuctions) {
-        registeredAuctions[auction].closeAuction();
-        registeredAuctions[auction].getWinner();
-        // show(registeredAuctions[auction]);
-        console.log(registeredAuctions[auction]);
+    for (var auction in exports.registeredAuctions) {
+        exports.registeredAuctions[auction].closeAuction();
+        exports.registeredAuctions[auction].getWinner();
+        console.log(exports.registeredAuctions[auction]);
     }
-    // logAuctionWinner(registeredAuctions)
-    // postLog();
 }
+exports.closeAuctions = closeAuctions;
