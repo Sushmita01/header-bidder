@@ -5,7 +5,7 @@
   "scripts": {
     "tsc:w": "tsc headerBidder.ts adapterManager.ts auctionManager.ts logger.ts -w",
     "start": "concurrently \"npm run tsc:w\"  \"node ./bin/www\" ",
-    "begin": "node ./bin/www" 
+    "begin": "node ./bin/www"
   },
   "dependencies": {
     "concurrently": "^4.1.0",
@@ -18,5 +18,8 @@
     "nodemon": "^1.19.0",
     "promise": "^8.0.3",
     "typescript": "^2.1.6"
+  },
+  "devDependencies": {
+    "webpack": "^4.31.0"
   }
 }

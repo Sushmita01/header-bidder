@@ -17,9 +17,8 @@ function hbShow(divID) {
         let auction=registeredAuctions[auctionID];
         let winningAD=auction.winner.code.toString();
         let height=auction.slotSize.split('x')[1];
-        iframe.outerHTML="<iframe height="+height+"></iframe>";
-        let customIframe=currentDiv.children[1];
-        customIframe.setAttribute('srcdoc',winningAD);
+        iframe.setAttribute('height',height)
+        iframe.setAttribute('srcdoc',winningAD);
         console.log(currentDiv);
     }
     

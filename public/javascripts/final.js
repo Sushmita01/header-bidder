@@ -188,9 +188,8 @@ function hbShow(divID) {
     var auction = registeredAuctions[auctionID];
     var winningAD = auction.winner.code.toString();
     var height = auction.slotSize.split('x')[1];
-    iframe.outerHTML = "<iframe height=" + height + "></iframe>";
-    var customIframe = currentDiv.children[1];
-    customIframe.setAttribute('srcdoc', winningAD);
+    iframe.setAttribute('height', height);
+    iframe.setAttribute('srcdoc', winningAD);
     console.log(currentDiv);
 }
 //register auction for all slots
