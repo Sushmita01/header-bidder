@@ -16,6 +16,24 @@ for (let slot of config.adslots) {
 
 }
 
+var ProvIDMap={};
+for (let prov of config.providers) {
+    let provID=prov.ID;
+    if (!ProvIDMap.hasOwnProperty(provID)) {
+        ProvIDMap[provID]=prov.Name;
+    }
+
+}
+
+function replaceIDwithName(str) {
+    for (let id in ProvIDMap) {
+        if (str.indexOf(id)!=-1) {
+            str=str.replace(id, ProvIDMap[id])
+        }
+    }
+    return str
+}
+
 window.hbShow=function hbShow(divID) {
         let currentDiv=document.getElementById(divID);
         let iframe=document.createElement('iframe');
@@ -23,6 +41,7 @@ window.hbShow=function hbShow(divID) {
         let auctionID="A"+slotDivMap[divID];
         let auction=auctionManager.registeredAuctions[auctionID];
         let winningAD=auction.winner.code.toString();
+        winningAD=replaceIDwithName(winningAD)
         let height=auction.slotSize.split('x')[1];
         iframe.setAttribute('height',height)
         iframe.setAttribute('srcdoc',winningAD);
