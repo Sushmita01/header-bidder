@@ -12,11 +12,13 @@ var adapters=[];
 class Bid {
     CPM: number;
     code: string;
+    EPC: number;
     provider: string
 
-    constructor(CPM,code,provider) {
+    constructor(CPM,code,EPC,provider) {
         this.CPM=CPM;
         this.code=code;
+        this.EPC=EPC;
         this.provider=provider;
     }
 }
@@ -34,15 +36,16 @@ class Adapter {
     revenueShare: number;
     size : string;
     getBid = function () {
-        let bidParam={slotID: this.slotID, providerID: this.providerID, floorPrice: this.floorPrice,size:this.size};
+        let bidParam={slotID: this.slotID, EPC: this.EPC, providerID: this.providerID, floorPrice: this.floorPrice,size:this.size};
         return makeBidRequest(bidParam);
          
     }
 
-    constructor(auctionID,noBid,slotID,size,providerID,floorPrice) {
+    constructor(auctionID,noBid,slotID,EPC,size,providerID,floorPrice) {
         this.auctionID=auctionID;
         this.noBid=noBid;
         this.slotID=slotID;
+        this.EPC=EPC;
         this.size=size;
         this.providerID=providerID;
         this.floorPrice=floorPrice;
@@ -51,7 +54,7 @@ class Adapter {
 
 function createBid(adapter) {
 //create a bid object
-    return new Bid(adapter.CPM,adapter.code,adapter.providerID);
+    return new Bid(adapter.CPM,adapter.code,adapter.EPC,adapter.providerID);
 }
 
 function makeBidRequest(bidParam)  {
@@ -81,7 +84,7 @@ function makeBidRequest(bidParam)  {
             let bidResponse=JSON.parse(this.responseText);
             if (bidResponse.length==config.AdslotProvidersMap.length) {
                 console.log("all bids received",bidResponse);
-                // logProviderResponse(bidResponse);    //pushing to log channel
+-
                 resolve(bidResponse);
 
             }
@@ -106,12 +109,13 @@ export function createAdapter(auctionObj)
             //only create adapter if slot matches the slot put up for auction
             if (mapObject['slotID']==auctionObj['slotID']) { 
 
-                let currentAdapter = new Adapter(auctionObj.auctionID,true,mapObject['slotID'],auctionObj['slotSize'],mapObject['providerID'],mapObject['FloorPrice']);
+                let currentAdapter = new Adapter(auctionObj.auctionID,true,mapObject['slotID'],mapObject['ExternalPlacementID'],auctionObj['slotSize'],mapObject['providerID'],mapObject['FloorPrice']);
                 adapters.push(currentAdapter);
 
                 let bidPromise=currentAdapter.getBid(); //getting bids
 
                 bidPromise.then((data)=> {
+                    logger.logProviderResponse(data)
                     for(let ad of adapters) {
                         for(let bid of data) {
                             if (ad.providerID==bid.providerID && ad.slotID==bid.slotID) {
@@ -123,7 +127,7 @@ export function createAdapter(auctionObj)
                             }
                         }
                     }
-                    logger.logAuctionParticipant(auctionManager.registeredAuctions);
+                    logger.logAuctionParticipant(auctionManager.registeredAuctions)
                     resolve(true);
                     // 
                 })

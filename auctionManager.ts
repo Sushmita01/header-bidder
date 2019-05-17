@@ -8,6 +8,7 @@ export class Auction {
     slotID: Number;
     slotSize: string;
     winner: string;
+    EPC: number;
     status: boolean; //0=active; 1=closed
     bids = [];
 

@@ -59,7 +59,6 @@ for (let slot of config.adslots) {
     bidsAdded.then(()=> {
         auctionManager.closeAuctions();
         logger.logAuctionWinner(auctionManager.registeredAuctions)
-        logger.postLog();
     })
 }
 

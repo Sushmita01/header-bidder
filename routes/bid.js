@@ -7,9 +7,10 @@ var providerName;
 
 class BidResponse {
 
-    constructor(slotID,providerID,floorPrice,size) {
+    constructor(slotID,providerID,EPC,CPM,code) {
         this.slotID=slotID;
         this.providerID=providerID;
+        this.EPC=EPC
     }
 }
 
@@ -17,7 +18,7 @@ router.post('/', function(req, res, next) {
     bidResult=[];
     for (let bidParam of req.body) {
         let amount=Math.floor(Math.random() * (10 - bidParam.floorPrice)) + bidParam.floorPrice; 
-        let response=new BidResponse(bidParam.slotID,bidParam.providerID);
+        let response=new BidResponse(bidParam.slotID,bidParam.providerID,bidParam.EPC);
         response.CPM=amount;
         if( amount!=0) bidParam.noBid=false;
         providerName=response.providerID;

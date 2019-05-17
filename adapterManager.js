@@ -7,22 +7,24 @@ var logger = require("./logger");
 var bidParams = [];
 var adapters = [];
 var Bid = /** @class */ (function () {
-    function Bid(CPM, code, provider) {
+    function Bid(CPM, code, EPC, provider) {
         this.CPM = CPM;
         this.code = code;
+        this.EPC = EPC;
         this.provider = provider;
     }
     return Bid;
 }());
 var Adapter = /** @class */ (function () {
-    function Adapter(auctionID, noBid, slotID, size, providerID, floorPrice) {
+    function Adapter(auctionID, noBid, slotID, EPC, size, providerID, floorPrice) {
         this.getBid = function () {
-            var bidParam = { slotID: this.slotID, providerID: this.providerID, floorPrice: this.floorPrice, size: this.size };
+            var bidParam = { slotID: this.slotID, EPC: this.EPC, providerID: this.providerID, floorPrice: this.floorPrice, size: this.size };
             return makeBidRequest(bidParam);
         };
         this.auctionID = auctionID;
         this.noBid = noBid;
         this.slotID = slotID;
+        this.EPC = EPC;
         this.size = size;
         this.providerID = providerID;
         this.floorPrice = floorPrice;
@@ -31,7 +33,7 @@ var Adapter = /** @class */ (function () {
 }());
 function createBid(adapter) {
     //create a bid object
-    return new Bid(adapter.CPM, adapter.code, adapter.providerID);
+    return new Bid(adapter.CPM, adapter.code, adapter.EPC, adapter.providerID);
 }
 function makeBidRequest(bidParam) {
     bidParams.push(bidParam);
@@ -53,8 +55,7 @@ function makeBidRequest(bidParam) {
                     var bidResponse = JSON.parse(this.responseText);
                     if (bidResponse.length == config.AdslotProvidersMap.length) {
                         console.log("all bids received", bidResponse);
-                        // logProviderResponse(bidResponse);    //pushing to log channel
-                        resolve(bidResponse);
+                        -resolve(bidResponse);
                     }
                 }
             };
@@ -69,10 +70,11 @@ function createAdapter(auctionObj) {
             var mapObject = _a[_i];
             //only create adapter if slot matches the slot put up for auction
             if (mapObject['slotID'] == auctionObj['slotID']) {
-                var currentAdapter = new Adapter(auctionObj.auctionID, true, mapObject['slotID'], auctionObj['slotSize'], mapObject['providerID'], mapObject['FloorPrice']);
+                var currentAdapter = new Adapter(auctionObj.auctionID, true, mapObject['slotID'], mapObject['ExternalPlacementID'], auctionObj['slotSize'], mapObject['providerID'], mapObject['FloorPrice']);
                 adapters.push(currentAdapter);
                 var bidPromise = currentAdapter.getBid(); //getting bids
                 bidPromise.then(function (data) {
+                    logger.logProviderResponse(data);
                     for (var _i = 0, adapters_1 = adapters; _i < adapters_1.length; _i++) {
                         var ad = adapters_1[_i];
                         for (var _a = 0, data_1 = data; _a < data_1.length; _a++) {

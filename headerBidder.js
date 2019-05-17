@@ -53,6 +53,5 @@ for (var _d = 0, _e = config.adslots; _d < _e.length; _d++) {
     bidsAdded.then(function () {
         auctionManager.closeAuctions();
         logger.logAuctionWinner(auctionManager.registeredAuctions);
-        logger.postLog();
     });
 }
