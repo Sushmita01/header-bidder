@@ -2,7 +2,11 @@
 
 ## What's header bidding?
 
-Header bidding, also known as advance bidding or pre-bidding, is an advanced programmatic technique wherein publishers offer inventory to multiple ad exchanges simultaneously before making calls to their ad servers (mostly DoubleClick for Publishers). The idea is that by letting multiple demand sources bid on the same inventory at the same time, publishers increase their yield and make more money.
+Digital advertising, despite the massive industry built to streamline it, is still plagued by inefficiency and fragmentation. Programmatic selling may mean automation in theory, but it still requires plenty of behind-the-scenes work to connect the buyers to the sellers.
+
+Born out of this reality are techniques such as header bidding, one of the many ways publishers are trying to eke more revenue out of their ad inventory. 
+
+Header bidding, also known as advance bidding or pre-bidding, is an advanced programmatic technique wherein publishers offer inventory to multiple ad exchanges simultaneously before making calls to their ad servers. The idea is that by letting multiple demand sources bid on the same inventory at the same time, publishers increase their yield and make more money.
 
 ## Project details
 
